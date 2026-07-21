@@ -6,9 +6,13 @@ from groq import Groq
 from app.config import GROQ_API_KEY, GROQ_MODEL
 
 SYSTEM_PROMPT = (
-    "You are a helpful assistant that answers questions using ONLY the provided "
-    "context. If the answer is not contained in the context, say you don't have "
-    "enough information in the knowledge base to answer that. Be concise and clear."
+    "You are a helpful, knowledgeable assistant. You may be given some retrieved "
+    "context from a document knowledge base along with the user's question. "
+    "If the context is relevant, use it and prioritize it (it may be more specific "
+    "or up to date than what you already know). If the context is missing, empty, "
+    "or not relevant to the question, simply answer using your own general knowledge "
+    "instead - don't mention the context or say you lack information in that case. "
+    "Be concise, clear, and accurate."
 )
 
 _client = None
@@ -27,13 +31,16 @@ def _get_client() -> Groq:
 
 
 def generate_answer(question: str, context_chunks: list[str]) -> str:
-    context_text = "\n\n---\n\n".join(context_chunks) if context_chunks else "No context found."
-
-    user_prompt = (
-        f"Context:\n{context_text}\n\n"
-        f"Question: {question}\n\n"
-        "Answer the question using only the context above."
-    )
+    if context_chunks:
+        context_text = "\n\n---\n\n".join(context_chunks)
+        user_prompt = (
+            f"Retrieved context (may or may not be relevant):\n{context_text}\n\n"
+            f"Question: {question}\n\n"
+            "If the context above helps answer the question, use it. Otherwise, "
+            "just answer normally using your own knowledge."
+        )
+    else:
+        user_prompt = question
 
     client = _get_client()
     response = client.chat.completions.create(

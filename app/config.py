@@ -13,7 +13,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 GROQ_MODEL = os.getenv("GROQ_MODEL", "llama-3.1-8b-instant")
 
-EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "all-MiniLM-L6-v2")
+EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "BAAI/bge-small-en-v1.5")
 TOP_K = int(os.getenv("TOP_K", "4"))
 
 DOCS_DIR = BASE_DIR / "data" / "docs"
